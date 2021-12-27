@@ -4,3 +4,6 @@ def img2label_paths(img_paths):
     return [sb.join(x.rsplit(sa, 1)).rsplit('.', 1)[0] + '.txt' for x in img_paths]
 
 
+
+def make_file_list():
+    train_img_list = list()
