@@ -1,43 +1,40 @@
-import torch
 from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-
-
-def get_label(img_path_list):
-    label_list = []
-    for p in img_path_list:
-        label_list.append()
-    return label_list
+import json
+from .utils import load_image
+from data.datasets.test import get_file_list, make_train_test
 
 
 class BasicDataset(Dataset):
-    def __init__(self, img_path_list, transform=None):
-        self.img_path_list = img_path_list
+    def __init__(self, data_list=None, transform=None):
+        self.data_list = data_list
         self.transform = transform
-        self.label = get_label(img_path_list)
-    
 
     def __len__(self):
-        return len(self.img_path_list)
+        return len(self.data_list)
 
-    
     def __getitem__(self, idx):
-        data = {}  # 이거 어떻게 만들지 함수 만드는게 가장 큰 일!!
-        key = list(self.data[idx].keys())[0]
-        img = Image.open(key).convert('RGB')   # imread 해야하나.. ㅜㅜ & 'RGB' 이거나 'L'이거나 선택하는 함수만들어 넣기
-        current_shape = img.size
-        img = img.resize(self.resize_factor, self.resize_factor)
-        label = self.data[idx][key]
+        data = {}   # 이거 제일 중요! 어떻게 만들지 -> line by line / folder etc..
+        img_dir, text_dir = self.data_list[idx]
+        img = load_image(img_dir, type='RGB')   # imread 함수 만들.. 거나 cv2 혹은 PIL로 하거나  +  'RGB'와 'L' 선택하는 함수 만들기
+        current_shape = img.size   # 이게 필요할지 안할지.. 우선..
 
         if self.transform is not None:
             img = self.transform(img)
 
-        return data
+        data = {}
+        with open(text_dir, "r") as json_file:
+            json_data = json.load(json_file)
+            for i in range(len(json_data['shapes'])):
+                data['file_name'] = json_data['imagePath']
+                data['label'] = json_data['shapes'][i]['label']
+                data['text_polys'] = json_data['shapes'][i]['points']
+
+        return img, data, current_shape
 
 
     # @staticmethod
     # def collate_fn(batch):
-    #     img, label, path, shapes = zip(*batch)  # transposed
+    #     img, label, path, shapes = zip(*batch)   # transposed
     #     for i, l in enumerate(label):
-    #         l[:, 0] = i  # add target image index for build_targets()
-    #     return torch.stack(img, 0), torch.cat(label, 0), path, shapes
+    #         l[:, 0] = i   # add target image index for build_targets()
+    #     return torch.stack(img, 0), torch.cat(label, 0), path, shape
