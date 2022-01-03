@@ -7,6 +7,8 @@ from transform.augmentation import Augmentation
 
 from hydra import compose, initialize
 from omegaconf import OmegaConf
+# from .checker import check_file
+
 
 initialize(congig_path="conf", job_name="test_app")  # 이 부분 수정
 cfg = compose(config_name="config", overrides=["data.image_dir", "data.label_dir", "data.train_ratio=0.6"])
@@ -24,7 +26,8 @@ def build_dataset(cfg):
         TRAIN_LIST, TEST_LIST = Augmentation(
             train_set=TRAIN_LIST, val_set=TEST_LIST, data_dir=cfg.data.image_dir
         )
-
+    
+    # TRAIN_LIST, TEST_LIST = check_file(TRAIN_LIST, TEST_LIST)
     train_datasets = BasicDataset(TRAIN_LIST, transform=_train_transforms())
     test_datasets = BasicDataset(TEST_LIST, transform=_test_transforms())
 
