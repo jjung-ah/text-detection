@@ -2,11 +2,11 @@
 
 
 To-do
-[ ] model
-[ ] engine
-[ ] demo
-[ ] evaluation
-[ ] solver
-[ ] utils
-[ ] train.py
-[ ] test.py
+[ ] model 
+[ ] engine 
+[ ] demo 
+[ ] evaluation 
+[ ] solver 
+[ ] utils 
+[ ] train.py 
+[ ] test.py 
