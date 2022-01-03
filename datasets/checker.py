@@ -1,95 +1,119 @@
-def _check_suffix(file='yolov5s.pt', suffix=('.pt',), msg=''):
-    # Check file(s) for acceptable suffix
+from pathlib import Path
+import os
+
+
+def check_format(self, root):
+    """data format check"""
+    # json이면 COCO
+    # xml이면 PASCAL VOC
+    # 아니면 LABELME
+    # 아니고.. yaml로 checking
+    return format
+
+
+def check_suffix(file='1st.yaml', suffix=('.yaml', '.py',), msg=''):
+    # Check file for acceptable suffix
     if file and suffix:
         if isinstance(suffix, str):
             suffix = [suffix]
         for f in file if isinstance(file, (list, tuple)) else [file]:
-            s = Path(f).suffix.lower()  # file suffix
+            s = Path(f).suffix.lower()   # file suffix
             if len(s):
                 assert s in suffix, f"{msg}{f} acceptable suffix is {suffix}"
 
 
-def _check_yaml(file, suffix=('.yaml', '.yml')):
-    # Search/download YAML file (if necessary) and return path, checking suffix
+def check_yaml(file, suffix=('.yaml', '.yml')):
+    """ Search YAML file (if necessary) and return path, checking suffix """
     return check_file(file, suffix)
 
-
-def _check_exists(self):
-    print("Image Folder : {}".format(os.path.join(self.root, self.IMAGE_FOLDER)))
-    print("Label Folder : {}".format(os.path.join(self.root, self.LABEL_FOLDER)))
-
-    return os.path.exists(os.path.join(self.root, self.IMAGE_FOLDER)) and \
-           os.path.exists(os.path.join(self.root, self.LABEL_FOLDER))
+'''
+# 다음과 같은 방법으로 사용
+with open(check_yaml(yaml_path), errors='ignore') as f:
+    data = yaml.safe_load(f)  # data dict
+'''
 
 
-def _check_file(file, suffix=''):
-    # Search/download file (if necessary) and return path
-    check_suffix(file, suffix)  # optional
-    file = str(file)  # convert to str()
-    if Path(file).is_file() or file == '':  # exists
+def check_file(file, suffix=''):
+    """ Search file (if necessary) and return path """
+    check_suffix(file, suffix)   # optional
+    file = str(file)   # convert to str()
+    # if Path(file).is_file() or file == '':   # exist
+    if Path(file).is_file():  # exist
         return file
-    elif file.startswith(('http:/', 'https:/')):  # download
-        url = str(Path(file)).replace(':/', '://')  # Pathlib turns :// -> :/
-        file = Path(urllib.parse.unquote(file).split('?')[0]).name  # '%2F' to '/', split https://url.com/file.txt?auth
-        if Path(file).is_file():
-            print(f'Found {url} locally at {file}')  # file already exists
-        else:
-            print(f'Downloading {url} to {file}...')
-            torch.hub.download_url_to_file(url, file)
-            assert Path(file).exists() and Path(file).stat().st_size > 0, f'File download failed: {url}'  # check
-        return file
-    else:  # search
-        files = []
-        for d in 'data', 'models', 'utils':  # search directories
-            files.extend(glob.glob(str(ROOT / d / '**' / file), recursive=True))  # find file
-        assert len(files), f'File not found: {file}'  # assert file was found
-        assert len(files) == 1, f"Multiple files match '{file}', specify exact path: {files}"  # assert unique
-        return files[0]  # return file
+    else:
+        assert Path(file).exists(), f'File not exist: {file}'  # check
+        # pass
 
 
-def _check_dataset(data, autodownload=True):
-    extract_dir = ''
-    if isinstance(data, (str, Path)) and str(data).endswith('.zip'):  # i.e. gs://bucket/dir/coco128.zip
-        download(data, dir='../datasets', unzip=True, delete=False, curl=False, threads=1)
-        data = next((Path('../datasets') / Path(data).stem).rglob('*.yaml'))
-        extract_dir, autodownload = data.parent, False
+def check_dataset(file_list):
+    file_list = [Path(x).resolve() for x in (file_list if isinstance(file_list, list) else [file_list])]
+    if not all(x.exists() for x in file_list):
+        print('\nWarning:  Dataset not found, nonexistent paths: %s' % [str(x) for x in file_list if not x.exists()])
 
-    # Read yaml (optional)
-    if isinstance(data, (str, Path)):
-        with open(data, errors='ignore') as f:
-            data = yaml.safe_load(f)  # dictionary
 
-    # Parse yaml
-    path = extract_dir or Path(data.get('path') or '')  # optional 'path' default to '.'
-    for k in 'train', 'val', 'test':
-        if data.get(k):  # prepend path
-            data[k] = str(path / data[k]) if isinstance(data[k], str) else [str(path / x) for x in data[k]]
 
-    assert 'nc' in data, "Dataset 'nc' key missing."
-    if 'names' not in data:
-        data['names'] = [f'class{i}' for i in range(data['nc'])]  # assign class names if missing
-    train, val, test, s = (data.get(x) for x in ('train', 'val', 'test', 'download'))
-    if val:
-        val = [Path(x).resolve() for x in (val if isinstance(val, list) else [val])]  # val path
-        if not all(x.exists() for x in val):
-            print('\nWARNING: Dataset not found, nonexistent paths: %s' % [str(x) for x in val if not x.exists()])
-            if s and autodownload:  # download script
-                root = path.parent if 'path' in data else '..'  # unzip directory i.e. '../'
-                if s.startswith('http') and s.endswith('.zip'):  # URL
-                    f = Path(s).name  # filename
-                    print(f'Downloading {s} to {f}...')
-                    torch.hub.download_url_to_file(s, f)
-                    Path(root).mkdir(parents=True, exist_ok=True)  # create root
-                    ZipFile(f).extractall(path=root)  # unzip
-                    Path(f).unlink()  # remove zip
-                    r = None  # success
-                elif s.startswith('bash '):  # bash script
-                    print(f'Running {s} ...')
-                    r = os.system(s)
-                else:  # python script
-                    r = exec(s, {'yaml': data})  # return None
-                print(f"Dataset autodownload {f'success, saved to {root}' if r in (0, None) else 'failure'}\n")
-            else:
-                raise Exception('Dataset not found.')
 
-    return data  # dictionary
+
+
+
+# def check_dataset(self):
+#     """data 존재여부 체크"""
+#     print("Image Folder : {}".format(os.path.join(self.root, self.IMAGE_FOLDER)))
+#     print("Label Folder : {}".format(os.path.join(self.root, self.LABEL_FOLDER)))
+#
+#     return os.path.exists(os.path.join(self.root, self.IMAGE_FOLDER)) and \
+#             os.path.exists(os.path.join(self.root, self.LABEL_FOLDER))
+
+
+# 데이터 비율 확인
+# 데이터 polygon
+# 동일한 자료형인지 체크 -> int, float
+# label -> string
+
+
+# Test 
+# p1 = 'D:\\PycharmProjects\\research-pytorch-text-detection-baek-v2\\data\\datasets\\utils.py'
+# p = 'D:\\PycharmProjects\\research-pytorch-text-detection-baek-v2\\data\\datasets\\config.yaml'
+# file_list = [p, p1]
+# print(check_file(p1))
+# # print(check_yaml(p1))
+# print(check_dataset(file_list))
+# print(check_suffix(p, '.yaml'))
+
+
+'''
+def cvtData(self):
+
+    result = []
+    voc = cvtVOC()
+
+    yolo = cvtYOLO(os.path.abspath(self.class_path))
+    flag, self.dict_data =voc.parse(os.path.join(self.root, self.LABEL_FOLDER))
+
+    try:
+
+        if flag:
+            flag, data =yolo.generate(self.dict_data)
+
+            keys = list(data.keys())
+            keys = sorted(keys, key=lambda key: int(key.split("_")[-1]))
+
+            for key in keys:
+                contents = list(filter(None, data[key].split("\n")))
+                target = []
+                for i in range(len(contents)):
+                    tmp = contents[i]
+                    tmp = tmp.split(" ")
+                    for j in range(len(tmp)):
+                        tmp[j] = float(tmp[j])
+                    target.append(tmp)
+
+                result.append({os.path.join(self.root, self.IMAGE_FOLDER, "".join([key, self.IMG_EXTENSIONS])) : target})
+
+            return result
+
+    except Exception as e:
+        raise RuntimeError("Error : {}".format(e))
+'''
+
+
