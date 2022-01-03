@@ -51,9 +51,11 @@ def check_dataset(file_list):
         print('\nWarning:  Dataset not found, nonexistent paths: %s' % [str(x) for x in file_list if not x.exists()])
 
 
+        
 
-
-
+# def check_file(img_list, json_list):
+#     if len(img_list) == len(json_list):
+#         return img_list, json_list
 
 
 # def check_dataset(self):
