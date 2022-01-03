@@ -1,0 +1,5 @@
+data:
+  root_dir:
+  image_dir:
+  label_dir:
+  train_ratio: 0.6
