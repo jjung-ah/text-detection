@@ -18,10 +18,9 @@ def save_image(image, img_path: str):
 
 
 def make_file_list(root_path: str, ext_list: list) -> list:
-    p = str(Path(root_path).resolve())
     file_list = []
     for ext in ext_list:
-        file_list += glob.glob(f'{p}/{ext}', recursive=True)   # iterator 형식으로 받으려면 glob.iglob 사용
+        file_list += glob.glob(f'{root_path}/{ext}', recursive=True)   # iterator 형식으로 받으려면 glob.iglob 사용
 
     return file_list
 
