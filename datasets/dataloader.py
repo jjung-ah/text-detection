@@ -16,20 +16,20 @@ print(OmegaConf.to_yaml(cfg))
 
 
 def build_dataset(cfg):
-    TRAIN_LIST, TEST_LIST = make_train_test(
+    train_list, test_list = make_train_test(
         image_dir=cfg.data.root_dir,   # data에 대한 hydra yaml파일 만들어야함
         train_ratio=cfg.data.train_ratio,
         shuffle=cfg.data.shuffle
     )
 
     if cfg.data.augmentation:
-        TRAIN_LIST, TEST_LIST = Augmentation(
-            train_set=TRAIN_LIST, val_set=TEST_LIST, data_dir=cfg.data.image_dir
+        train_list, test_list = Augmentation(
+            train_set=train_list, val_set=test_list, data_dir=cfg.data.image_dir
         )
-    
+
     # TRAIN_LIST, TEST_LIST = check_file(TRAIN_LIST, TEST_LIST)
-    train_datasets = BasicDataset(TRAIN_LIST, transform=_train_transforms())
-    test_datasets = BasicDataset(TEST_LIST, transform=_test_transforms())
+    train_datasets = BasicDataset(train_list, transform=_train_transforms())
+    test_datasets = BasicDataset(test_list, transform=_test_transforms())
 
     train_loader = DataLoader(train_datasets, batch_size=cfg.train.batch_size, drop_last=cfg.data.drop_last)
     test_loader = DataLoader(test_datasets, batch_size=1, drop_last=cfg.data.drop_last)
