@@ -1,21 +1,30 @@
 # 이 부분은 build.py로 따로 만들기
 
-# from torchvision import transforms
+# from data.transforms.transform import (
+#     Compose,
+#     ToPILImage,
+#     Resize,
+#     RandomVerticalFlip,
+#     ToTensor
+# )
 
+
+# # TODO
+# # cfg 선언 어디에 하는지 확인하기
 
 # def _train_transforms():
-#     return transforms.Compose([
-#         transforms.ToTensor(),
-#         transforms.Resize((,)),
-#         transforms.RandomVerticalFlip(p=0.5)
+#     return Compose([
+#         ToTensor(),
+#         Resize(cfg.training.transforms.resize.shape, cfg.training.transforms.resize.mode),
+#         RandomVerticalFlip(cfg.training.transforms.random_vertical_flip.probability)
 #     ])
 
-
-# def _val_transforms():
-#     return transforms.Compose([
-#         transforms.ToTensor(),
-#         transforms.Resize((,))
+# def _test_transforms():
+#     return Compose([
+#         ToTensor(),
+#         Resize(cfg.training.transforms.resize.shape, cfg.training.transforms.resize.mode)
 #     ])
+
 
 from torch import Tensor
 from torchvision.transforms.functional import _interpolation_modes_from_int
