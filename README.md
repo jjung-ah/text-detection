@@ -4,6 +4,8 @@
 To-do
 
 - [ ] data
+  - [X] transforms
+  - [ ] transfoms / build
   - [ ] augmentation
   - [ ] hydra
   - [ ] etc..
