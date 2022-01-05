@@ -1,5 +1,5 @@
-data:
-  root_dir:
-  image_dir:
-  label_dir:
-  train_ratio: 0.6
+defaults:
+  - data: defaults
+  - demo: defaults
+  - logs: defaults
+  - training: 1st_training
