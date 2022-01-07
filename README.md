@@ -11,6 +11,6 @@ To-do
   - [ ] augmentation
   - [ ] hydra
   - [ ] make border map
-  - [ ] modify
+  - [ ] modify dataset codes
   - [ ] etc..
 
