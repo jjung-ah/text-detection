@@ -10,12 +10,7 @@ To-do
   - [ ] transfoms / build
   - [ ] augmentation
   - [ ] hydra
+  - [ ] make border map
+  - [ ] modify
   - [ ] etc..
-- [ ] models
-- [ ] demo
-- [ ] engine
-- [ ] evaluation
-- [ ] solver
-- [ ] utils
-- [ ] train.py
-- [ ] test.py
+
